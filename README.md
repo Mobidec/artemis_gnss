@@ -1,10 +1,19 @@
-# artemis_gnss
+# artemis-gnss
 <b>A</b>utomated <b>R</b>econstruction of <b>T</b>rips and <b>E</b>xtraction of <b>M</b>obility <b>I</b>ndicators from GNSS <b>S</b>ignals
 
 <img src="https://raw.githubusercontent.com/Mobidec/artemis_gnss/refs/heads/main/doc/assets/France2030-Logo-1024x576.png" alt="logo">
 
 
 ---
+
+## Useful links
+
+Links to resources and documentation:
+- [Documentation](https://mobidec.github.io/artemis_gnss/index.html)
+- [GitHub Repository](https://github.com/Mobidec/artemis_gnss.git)
+- [Issues](https://github.com/Mobidec/artemis_gnss/issues)
+- [Changelog](https://github.com/Mobidec/artemis_gnss/blob/main/CHANGELOG.md)
+- [PyPI](https://pypi.org/project/artemis_gnss/)
 
 
 ## Description
@@ -25,16 +34,6 @@ The features planned to for implementation are the following:
 - A _unitary displacement_ is the movement between two stops.
 - A _trip_ groups unitary displacements using a same means of transport.
 - A _displacement_ groups trips, from an origin to its final destination. It is usually associated to one motivation class.
-
-
-## Useful links
-
-Links to resources and documentation:
-- [Documentation](https://mobidec.github.io/artemis_gnss/index.html)
-- [GitHub Repository](https://github.com/Mobidec/artemis_gnss.git)
-- [Issues](https://github.com/Mobidec/artemis_gnss/issues)
-- [Changelog](https://github.com/Mobidec/artemis_gnss/blob/main/CHANGELOG.md)
-- [PyPI](https://pypi.org/project/artemis_gnss/)
 
 
 ## Python Package Template Architecture
@@ -138,7 +137,7 @@ For more details on contributing and best practices, please refer to the `CONTRI
 Run:
 
 ```bash
-pip install artemis_gnss
+pip install artemis-gnss
 ```
 
 
