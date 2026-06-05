@@ -2,8 +2,10 @@
 name = "artemis_gnss"
 version = '0.0.0'
 authors = [
+	{ name = "ifpen-gp", email = "63413841+ifpen-gp@users.noreply.github.com" },
 ]
 maintainers = [
+	{ name = "ifpen-gp", email = "63413841+ifpen-gp@users.noreply.github.com" },
 ]
 description = "Automated Reconstruction of Trips and Extraction of Mobility Indicators from GNSS Signals (under development)"
 readme = "README.md"
@@ -76,6 +78,9 @@ license-files = []
 line-length = 140
 # list files/directories to exclude from ruff
 exclude = [
+    "tests",
+    "sphinx",
+    "src",
 ]
 
 [tool.ruff.lint]
