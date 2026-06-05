@@ -4,8 +4,8 @@
 This test is ignored when launching pytest command because located in tests/ignored (as configured in tox.ini).
 """
 
-from artemis_gnss import hello_world
+import artemis_gnss
 
 
 def test_hello_world():
-    assert hello_world() is None
+    assert True

@@ -5,7 +5,7 @@ authors = [
 ]
 maintainers = [
 ]
-description = "Adaptation of the template for github."
+description = "Automated Reconstruction of Trips and Extraction of Mobility Indicators from GNSS Signals (under development)"
 readme = "README.md"
 requires-python = ">=3.12"
 classifiers = [
@@ -15,7 +15,10 @@ classifiers = [
 ]
 dependencies = [
     # ajouter les dépendances necessaires
-    "pytest == 8.0.1",  # exemple qui peut être supprimé
+    "numpy >= 2.0.2",
+    "pandas >= 2.2.3",
+    "scipy >= 1.14.1",
+    "numba >= 0.60.0",
 ]
 
 license = { file = "LICENSE" }

@@ -1,17 +1,19 @@
 #!python3
 # -*- coding: utf-8 -*-
 """
-Module for demonstrating a simple 'Hello World' function.
-
-This module imports the hello_world function from the main module
-and makes it available for public use.
-
-Functions
----------
-hello_world()
-    Print 'Hello World!' to the console.
+Package for mobility data manipulation
+Created on 20/09/24
 """
 
-from .main import hello_world
+__version__ = "0.0.1"
+# import pkg_resources
+# __version__ = pkg_resources.get_distribution('artemis_gnss').version
 
-__all__ = ['hello_world']
+from . import enum_modes
+from . import config
+from . import process
+from . import kpi
+
+# alias
+from artemis_gnss.config import Config
+

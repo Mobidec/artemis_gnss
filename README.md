@@ -1,6 +1,30 @@
 # artemis_gnss
+<b>A</b>utomated <b>R</b>econstruction of <b>T</b>rips and <b>E</b>xtraction of <b>M</b>obility <b>I</b>ndicators from GNSS <b>S</b>ignals
+
+<img src="https://raw.githubusercontent.com/Mobidec/artemis_gnss/refs/heads/main/doc/assets/France2030-Logo-1024x576.png" alt="logo">
+
 
 ---
+
+
+## Description
+
+This package is under development. It consumes geospatial timeseries coming from e.g. GNSS acquisitions or other geolocalisation methods.
+The features planned to for implementation are the following:
+- [ ] Extraction of individual displacements, origin/destination, POIs; 
+- [ ] Projection of a trace on a map system; 
+- [ ] Identification of the means of transport; 
+- [ ] Identification of the motivation class of a trip; 
+- [ ] Marking missing, abnormal or inconsistent parts of a trace; 
+- [ ] Anonymization of a trace. 
+
+
+## Definitions
+
+- A _trace_ is a geospatial timeseries with at least a timestamp, a latitude and a longitude for each data point.
+- A _unitary displacement_ is the movement between two stops.
+- A _trip_ groups unitary displacements using a same means of transport.
+- A _displacement_ groups trips, from an origin to its final destination. It is usually associated to one motivation class.
 
 
 ## Useful links
@@ -11,21 +35,6 @@ Links to resources and documentation:
 - [Issues](https://github.com/Mobidec/artemis_gnss/issues)
 - [Changelog](https://github.com/Mobidec/artemis_gnss/blob/main/CHANGELOG.md)
 - [PyPI](https://pypi.org/project/artemis_gnss/)
-
-
-## Description
-
-This "Python Package" template is a complete template designed to create a Python package according to IFPEN's development standards, deployable internally within IFPEN or on the Cloud. This template provides developers with a Python project architecture in which they can contribute, document, and make it available to all IFPEN developers.
-
-This package includes:
-- A unit test structure based on the [Pytest](https://docs.pytest.org/en/stable/) library
-- Automatic documentation generation based on the [Sphinx](https://www.sphinx-doc.org/en/master/) library
-- A CI/CD pipeline for deploying the Python package to a Python server
-
-
-## Github Pages
-
-Your automaticly generated documentation (with Sphinx) is [Here](https://mobidec.github.io/artemis_gnss/)
 
 
 ## Python Package Template Architecture
@@ -126,32 +135,12 @@ For more details on contributing and best practices, please refer to the `CONTRI
 
 ### Installation
 
-If you are using the provided `pip.conf`, you can simply run:
+Run:
 
 ```bash
 pip install artemis_gnss
 ```
 
-Otherwise, you can specify the package index depending on whether you are in an internal (on-premise) or external (cloud) environment.
-
-```bash
-# On-premise
-pip install artemis_gnss --extra-index-url https://nexus.ifpen.fr/repository/fast-it/simple
-
-# On Cloud
-pip install artemis_gnss --extra-index-url https://nexus.fastit.dev/repository/fast-it/simple
-```
-
-Alternatively, you can set the package index URL as an environment variable:
-
-```bash
-# On-premise
-export PIP_EXTRA_INDEX_URL=https://nexus.fastit.dev/repository/fast-it/simple
-
-
-# On Cloud
-export PIP_EXTRA_INDEX_URL=https://nexus.ifpen.fr/repository/fast-it/simple
-```
 
 ### Example Usage of the Python Package in Your Code
 
