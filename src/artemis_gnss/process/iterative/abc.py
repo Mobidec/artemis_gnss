@@ -31,7 +31,7 @@ class StatefulStep(ABC):
         if purge_only_once:
             assert(not self._purged)
 
-    def purge(self, *args, **kwargs) -> List[pd.DataFrame]:
+    def purge_last_step(self, *args, **kwargs) -> List[pd.DataFrame]:
         """
         Last steps to finalize treatment (if necessary)
         """
@@ -39,17 +39,18 @@ class StatefulStep(ABC):
             assert(not self._purged)
         self._purged = True
 
-    def flush(self, *args, **kwargs) -> List[pd.DataFrame]:
+    def flush_purge_and_reset(self, *args, **kwargs) -> List[pd.DataFrame]:
         """
         Do last steps, return result and initialize
         """
-        output = self.purge(**kwargs)
+        output = self.purge_last_step(**kwargs)
         self.initialize()
         return output
 
     def get_state(self) -> dict:
         """
         Get dict of state variables necessary to restore the computation later
+
         :return:
         """
         raise NotImplementedError

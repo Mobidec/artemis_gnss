@@ -5,7 +5,7 @@ Welcome to artemis_gnss's documentation!
    :maxdepth: 2
    :caption: Contents:
    
-   pages/example_page
+   pages/clean_process
    
    notebooks/example_notebook
 

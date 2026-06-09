@@ -16,6 +16,10 @@ from artemis_gnss.process.iterative.E_merge_portions import MergePortionStep
 
 
 class CleanProcess(StatefulStep):
+    """
+    Implementation of the steps to extract displacements from raw traces with data cleaning options
+    """
+
     def __init__(self):
         super().__init__()
         self.options: CleanOptions = None
@@ -29,6 +33,7 @@ class CleanProcess(StatefulStep):
         """
         Reset state of main process and initialize common_timestamp from options.common_timestamp or from an initial
         stack of traces, sort this stack of traces according to the timestamp of the first sample
+
         :param traces:
         :param options: options to use for this iteration of the process process
         If user gives options.common_timestamp, the value from the user is used
@@ -56,6 +61,14 @@ class CleanProcess(StatefulStep):
         return traces
 
     def append(self, trace: pd.DataFrame, *args, **kwargs) -> List[pd.DataFrame]:
+        """
+        Feed process with new trace. The traces must be fed in chronological order.
+
+        :param trace:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         super().append(trace)
         if self.options.inputs_deepcopy == StepDeepCopy.Post_Init:
             trace = trace.copy(deep=True)
@@ -70,14 +83,17 @@ class CleanProcess(StatefulStep):
         self.trips += new_trips
         return new_trips
 
-    def purge(self, *args, **kwargs) -> List[pd.DataFrame]:
-        super().purge()
-        residual_portion = self._process_split_trace.purge()
+    def purge_last_step(self, *args, **kwargs) -> List[pd.DataFrame]:
+        """
+        Last steps to finalize treatment (if necessary)
+        """
+        super().purge_last_step()
+        residual_portion = self._process_split_trace.purge_last_step()
         if residual_portion is not None:
             new_trips = self._process_merge.append(residual_portion[0], self.options)
         else:
             new_trips = []
-        last_trip = self._process_merge.purge(self.options)
+        last_trip = self._process_merge.purge_last_step(self.options)
         if last_trip is not None:
             new_trips.append(last_trip[0])
         self.trips += new_trips
@@ -86,7 +102,8 @@ class CleanProcess(StatefulStep):
     def process_all(self, traces: List[pd.DataFrame], *,
                     options: CleanOptions = None, init_last_trip: pd.DataFrame = None) -> List[pd.DataFrame]:
         """
-        Main entry point
+        Main entry point which applies the process to a collection of traces.
+
         :param traces: list of raw traces to process
         :param options: options.common_timestamp: timestamp for t=0 in output traces
         Usage 1: no timestamp for each trace => the time vectors are referenced to options.common_timestamp
@@ -97,15 +114,18 @@ class CleanProcess(StatefulStep):
         traces = self.initialize(traces, options=options, init_last_trip=init_last_trip)
         for trace in traces:
             self.append(trace)
-        self.purge()
+        self.purge_last_step()
         return self.trips
 
-    def flush(self, *args, **kwargs) -> List[pd.DataFrame]:
-        self.purge()
+    def flush_purge_and_reset(self, *args, **kwargs) -> List[pd.DataFrame]:
+        """
+        Do last steps, return result and initialize
+        """
+        self.purge_last_step()
         trips = self.trips
         self.trips: List[pd.DataFrame] = []
-        self._process_merge.flush(self.options)
-        self._process_split_trace.flush()
+        self._process_merge.flush_purge_and_reset(self.options)
+        self._process_split_trace.flush_purge_and_reset()
         self.initialize()
         return trips
 

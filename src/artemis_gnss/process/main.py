@@ -63,14 +63,15 @@ def process_traces(traces: Union[pd.DataFrame, dict, Trace, List[Union[dict, pd.
         trace_concat = pd.concat((trace_concat, trace))
 
     # cut into portions between stops and clean
-    portions, residual = stop_or_gap_divide(trace_concat, duration_cut_s=Config.STOP_DURATION_MAX__CUT_sec)
-    if residual is not None:
-        portions.append(residual)
+    portions, residual_trace = stop_or_gap_divide(trace_concat, duration_cut_s=Config.STOP_DURATION_MAX__CUT_sec)
+    if residual_trace is not None:
+        portions.append(residual_trace)
     previous_portion = init_last_trip
     debug_history_portions_raw = deepcopy(portions) if Config.ENABLE_DEBUG else []
     idx_rm = []
     for i, trace in enumerate(portions):
-        clean = clean_portion_steps(trace, previous_portion=previous_portion, options=options)
+        clean = trace
+        clean_portion_steps(clean, previous_portion=previous_portion, options=options)
         if clean is not None:
             if Config.ENABLE_DEBUG:
                 clean["portion_no"] = i

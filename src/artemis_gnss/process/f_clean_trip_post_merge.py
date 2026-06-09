@@ -18,12 +18,34 @@ from artemis_gnss.algos.gps_noise_detection import crow_fly_or_round_trip_distan
 from artemis_gnss.algos.condition_intervals import propagate_diff_cond
 
 include_space_jumps = True
-include_stationary = True
+include_stationary = True   # also used in D. clean portion
 include_rejected = True
 trip_remove_extremities = True
 post_merge_edit_last_trip = True
 stationary_resume_one_point = not Config.ENABLE_DEBUG
 internal_fields = ["int_gps_distance_step"]
+
+
+def clean_trip_steps(trip: pd.DataFrame, options: CleanOptions) -> None:
+    """
+    Final cleaning steps implemented on the trip.
+    Current implementation includes:
+    - Recompute "timestamp" vector
+
+    :param trip:
+    :param options:
+    :return:
+    """
+    # recompute timestamp vector
+    trip.attrs["generation"] = GenerationType.Extract
+    common_timestamp = options.common_timestamp
+    if common_timestamp is not None:
+        trip.attrs["timestamp"] = common_timestamp
+        if options.output_timestamp:
+            mem_timestamp_vect = trip["timestamp"] if "timestamp" in trip else None
+            trace_time_vect_to_timestamp_vect(trip, ref_timestamp=common_timestamp)
+            if mem_timestamp_vect is not None:
+                assert(np.all(trip["timestamp"] == mem_timestamp_vect))
 
 
 def merge_new_trip_check_space_gap(new_trip: pd.DataFrame, previous_trip: pd.DataFrame) -> List[pd.DataFrame]:
@@ -33,7 +55,7 @@ def merge_new_trip_check_space_gap(new_trip: pd.DataFrame, previous_trip: pd.Dat
     This ensures the algorithm will send a continuous trace of localizations.
     :param new_trip: first portion of the trip under construction
     :param previous_trip: previously finished trip
-    :return: list of missing trips
+    :return: list of missing displacements
     """
     if previous_trip is None:
         return []
@@ -63,6 +85,14 @@ def curate_trip_post_merge_div(trip: pd.DataFrame, options: CleanOptions):
 
 
 def reformat_stationary_trip(portion: pd.DataFrame) -> pd.DataFrame:
+    """
+    Change portion attributes for a trip which was found stationary (in a restricted radius).
+    This function can annihilate the portion if it is too short.
+    It optionally reduces the data points to a unique point with an estimated radius of presence.
+
+    :param portion:
+    :return:
+    """
     if len(portion) < Config.DISPLACEMENT_MIN_LEN and not include_rejected:
         return None
     if stationary_resume_one_point:
@@ -109,20 +139,19 @@ def merge_stationary_trips(reformated_stationary_trip_1: pd.DataFrame,
 def clean_trip_post_merge_steps(trip: pd.DataFrame, options: CleanOptions,
                                 previous_trip: pd.DataFrame, is_last_trip: bool) \
         -> Tuple[List[pd.DataFrame], pd.DataFrame]:
+    """
+    Rearrange trip into multiple displacements according to previous trip.
+
+    :param trip:
+    :param options:
+    :param previous_trip:
+    :param is_last_trip:
+    :return:
+    """
     init_previous_trip = previous_trip
     init_previous_trip_has_movement = not previous_trip.attrs["generation"] == GenerationType.StationaryData if previous_trip is not None else False
     new_trips: List[pd.DataFrame] = [init_previous_trip] if init_previous_trip is not None else []
     last_point = None
-    # recompute timestamp vector
-    trip.attrs["generation"] = GenerationType.Extract
-    common_timestamp = options.common_timestamp
-    if common_timestamp is not None:
-        trip.attrs["timestamp"] = common_timestamp
-        if options.output_timestamp:
-            mem_timestamp_vect = trip["timestamp"] if "timestamp" in trip else None
-            trace_time_vect_to_timestamp_vect(trip, ref_timestamp=common_timestamp)
-            if mem_timestamp_vect is not None:
-                assert(np.all(trip["timestamp"] == mem_timestamp_vect))
     # remove points with no speed from beginning and end of trip
     if "speed" in trip:
         bool_space_gap = propagate_diff_cond(trip["int_gps_distance_step"].values[1:] > Config.SPACE_GAP_THRESHOLD_m_s)
@@ -199,7 +228,8 @@ def clean_trip_post_merge_steps(trip: pd.DataFrame, options: CleanOptions,
         last_trip = None
     else:
         last_trip = new_trips.pop(-1)
+    for trip in new_trips:
+        clean_trip_steps(trip, options=options)
     return new_trips, last_trip
-
 
 

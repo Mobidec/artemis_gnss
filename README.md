@@ -31,8 +31,8 @@ The features planned to for implementation are the following:
 ## Definitions
 
 - A _trace_ is a geospatial timeseries with at least a timestamp, a latitude and a longitude for each data point.
-- A _unitary displacement_ is the movement between two stops.
-- A _trip_ groups unitary displacements using a same means of transport.
+- A _portion_ is the movement between two stops.
+- A _trip_ groups portions using a same means of transport.
 - A _displacement_ groups trips, from an origin to its final destination. It is usually associated to one motivation class.
 
 

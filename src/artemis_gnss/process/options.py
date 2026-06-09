@@ -32,6 +32,7 @@ class CleanOptions:
         self.output_timestamp = True
         self.default_time_step = Config.DEFAULT_TIME_STEP_SEC
         self.remove_internal_fields = not Config.ENABLE_DEBUG
+        self.portion_gps_noise_replace_by_mean: bool = True
 
     def __copy__(self):
         # basic copy function
