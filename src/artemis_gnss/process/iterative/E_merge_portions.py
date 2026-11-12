@@ -25,7 +25,7 @@ merge_edit_init_last_trip = True
 
 def portion_decide_merge(current_trip: pd.DataFrame, portion: pd.DataFrame) -> bool:
     """
-    This function checks if a portion can be merged to a trip under construction.
+    This function checks if a portion can be merged to a displacement under construction.
     If it not the case, the trip must be finalized and the portion must become the beginning of the next trip.
     :param current_trip: trip under construction
     :param portion: portion to add
@@ -57,6 +57,16 @@ def portion_decide_merge(current_trip: pd.DataFrame, portion: pd.DataFrame) -> b
     return decide_merge
 
 
+def portion_decide_merge_to_trip(current_trip: pd.DataFrame, portion: pd.DataFrame) -> bool:
+    """
+    Checks if a portion can be appended to an existing trip
+    :param current_trip:
+    :param portion:
+    :return:
+    """
+    return portion.attrs["imt"] == current_trip.attrs["imt"]
+
+
 class MergePortionStep(StatefulStep):
     """
     This process merges portions into displacements (a displacement is composed of multiple displacements)
@@ -65,6 +75,7 @@ class MergePortionStep(StatefulStep):
     def __init__(self):
         super().__init__()
         self.current_trip: pd.DataFrame = None  # trip under construction
+        self.current_displacement: pd.DataFrame = None  # displacement under construction
         self.previous_trip: pd.DataFrame = None  # last trip returned
         self.previous_portion: pd.DataFrame = None  # last portion
         # mechanism to merge with last trip in database
@@ -83,6 +94,7 @@ class MergePortionStep(StatefulStep):
         else:
             self.current_trip, self.previous_trip = None, init_last_trip
             self._init_last_trip_passed = True
+        self.current_displacement = None
         self.previous_portion = init_last_trip
         self.init_last_trip = init_last_trip
         self.init_last_trip_has_changed = False
@@ -102,8 +114,17 @@ class MergePortionStep(StatefulStep):
         if self.current_trip is None:
             self.current_trip = clean
         elif portion_decide_merge(self.current_trip, clean):
-            self.current_trip = pd.concat((self.current_trip, clean))
+            if portion_decide_merge_to_trip(self.current_trip, clean):
+                self.current_trip = pd.concat((self.current_trip, clean))
+            else:
+                # append trip to displacement
+                self.current_displacement = pd.concat((self.current_displacement, self.current_trip)) if self.current_displacement is not None else self.current_trip
+                # start a new trip
+                self.current_trip = clean
         else:
+            self.current_displacement = pd.concat((self.current_displacement, self.current_trip)) if self.current_displacement is not None else self.current_trip
+            # The following function can add an intermediary trip between the previous_displacement and the current_displacement, which may be merged to the current_displacement (to be confirmed)
+            # TODO: consider displacements and not trips in this function call
             new_trips_add, self.previous_trip = clean_trip_post_merge_steps(self.current_trip, options, previous_trip=self.previous_trip,
                                                                             is_last_trip=False)
             new_trips += new_trips_add

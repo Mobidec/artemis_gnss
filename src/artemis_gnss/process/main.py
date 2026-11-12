@@ -110,7 +110,7 @@ def process_traces(traces: Union[pd.DataFrame, dict, Trace, List[Union[dict, pd.
     if current_trip is not None:
         last_trace = current_trip
         new_trips, _ = clean_trip_post_merge_steps(last_trace, options=options, previous_trip=previous_trip,
-                                                        is_last_trip=True)
+                                                   is_last_trip=True)
         displacements += new_trips
         if displacements:
             previous_trip = displacements[-1]

@@ -144,7 +144,8 @@ def clean_trip_post_merge_steps(trip: pd.DataFrame, options: CleanOptions,
                                 previous_trip: pd.DataFrame, is_last_trip: bool) \
         -> Tuple[List[pd.DataFrame], pd.DataFrame]:
     """
-    Rearrange trip into multiple displacements according to previous trip.
+    Rearrange trip into multiple trips according to previous trip.
+    This function handles the case where there are gaps between previous_trip and trip.
 
     :param trip:
     :param options:
