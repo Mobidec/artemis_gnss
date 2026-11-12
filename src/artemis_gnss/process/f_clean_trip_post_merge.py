@@ -36,6 +36,10 @@ def clean_trip_steps(trip: pd.DataFrame, options: CleanOptions) -> None:
     :param options:
     :return:
     """
+    pass
+
+
+def prepare_trip_attrs(trip: pd.DataFrame, options: CleanOptions) -> None:
     # recompute timestamp vector
     trip.attrs["generation"] = GenerationType.Extract
     common_timestamp = options.common_timestamp
@@ -152,8 +156,9 @@ def clean_trip_post_merge_steps(trip: pd.DataFrame, options: CleanOptions,
     init_previous_trip_has_movement = not previous_trip.attrs["generation"] == GenerationType.StationaryData if previous_trip is not None else False
     new_trips: List[pd.DataFrame] = [init_previous_trip] if init_previous_trip is not None else []
     last_point = None
+    prepare_trip_attrs(trip, options)
     # remove points with no speed from beginning and end of trip
-    if "speed" in trip:
+    if "speed" in trip.keys():
         bool_space_gap = propagate_diff_cond(trip["int_gps_distance_step"].values[1:] > Config.SPACE_GAP_THRESHOLD_m_s)
         bool_move = np.logical_or(trip["speed"].values > Config.SPEED_STOP_THRESHOLD_low_m_s, bool_space_gap)
         idx = np.argwhere(bool_move)

@@ -20,7 +20,15 @@ Two successive _traces_ can overlap in time. In this case, the most recent data 
 Each _elementary portion_ is analyzed and attributed a first means of transport. The _elementary portions_
 are then merged into a _displacement_. A new _displacement_ is started if the time or distance between the last point and the new _portion_ is too large.
 
-The stateful implementation is meant to accept new traces at any moment, with the constraint of feeding them in chronological order.
+
+There are two implementations of the process:
+1. The iterative and stateful implementation (module artemis_gnss.process.iterative) is fed the traces in a chronological order. 
+Its state can be saved and restored.
+2. The function implementation, which is called on a list of traces. The function calls are the same as the iterative implementation 
+but its code is contained in a unique function, which may be easier to interpret. 
+The function process_traces in artemis_gnss.process.main is the main function. 
+It redirects to the iterative implementation if the optional argument iterative_implementation is set to True.   
+
 
 
 # Detailed steps
@@ -57,13 +65,18 @@ The current treatments are:
 
 ## E. Merge portions into displacements
 
-There is a stateful implementation of this step which keeps in its state the last unfinished _displacement_. The last
-_displacement_ is released for the last call (last portion). The stateful implementation is responsible for applying step D to each portion given in input. 
+There is a stateful implementation of this step which keeps in its state the last unfinished _displacement_. 
+The last _displacement_ is released when called on the last call (last portion). 
+The stateful implementation is responsible for applying step D to each portion given in input. It also applies step F when a _displacement_ is released.
 
-The main function is `clean_trip_post_merge_steps`. It is responsible for calling the function of step F on each output displacement.
+The method `append` of module `artemis_gnss.process.iterative.E_merge_portions` is the entry point for this step. 
+It takes a trace and check if can be appended to the current displacement. If not, the displacement under construction 
+is released and a new displacement is started.
 
 __TODO__: document this step
 
 ## F. Clean displacement signals
 
 This step applies treatments to the finalized displacement. There are no treatments implemented for the moment.
+
+The main function is `clean_trip_post_merge_steps`. It is responsible for calling the function of step F on each output displacement.
